@@ -81,7 +81,7 @@ async function fetchGraphqlActivity(from: Date, to: Date, token: string) {
         to: to.toISOString(),
       },
     }),
-    next: { revalidate: 3600 },
+    cache: "force-cache",
   });
 
   if (!response.ok) throw new Error(`GitHub GraphQL returned ${response.status}`);
@@ -135,7 +135,7 @@ async function fetchPublicCreedDates(from: Date, token?: string) {
     for (let page = 1; page <= 5; page += 1) {
       const response = await fetch(
         `https://api.github.com/repos/${USERNAME}/${repository}/commits?since=${encodeURIComponent(from.toISOString())}&per_page=100&page=${page}`,
-        { headers, next: { revalidate: 3600 } },
+        { headers, cache: "force-cache" },
       );
       if (!response.ok) break;
       const commits = await response.json();
@@ -156,7 +156,7 @@ async function fetchPublicActivity(from: Date, to: Date, token?: string) {
     years.map(async (year) => {
       const response = await fetch(
         `https://github.com/users/${USERNAME}/contributions?from=${year}-01-01&to=${year}-12-31`,
-        { next: { revalidate: 3600 } },
+        { cache: "force-cache" },
       );
       if (!response.ok) throw new Error(`GitHub calendar returned ${response.status}`);
       return parsePublicCalendar(await response.text());
